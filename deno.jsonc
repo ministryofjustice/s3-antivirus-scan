@@ -1,0 +1,40 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts",
+    "test": "deno test --allow-net --permission-set=default",
+    "init-garage": "deno run --allow-net init-garage.ts"
+  },
+  "imports": {
+    "@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@^3.917.0",
+    "@bradenmacdonald/s3-lite-client": "jsr:@bradenmacdonald/s3-lite-client@^0.9.4",
+    "@std/assert": "jsr:@std/assert@^1.0.15"
+  },
+  "permissions": {
+    "default": {
+      "env": [
+        // ENV vars for aws-sdk
+        "AWS_CONFIG_FILE",
+        "AWS_EXECUTION_ENV",
+        "AWS_LAMBDA_FUNCTION_NAME",
+        "AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA",
+        "AWS_PROFILE",
+        "AWS_SHARED_CREDENTIALS_FILE",
+        "HOME",
+        "HOMEDRIVE",
+        "HOMEPATH",
+        "USERPROFILE",
+        "_X_AMZN_TRACE_ID",
+        // Custom ENV vars
+        "CLAMAV_HOST",
+        "CLAMAV_PORT",
+        "S3_ENDPOINT",
+        "GARAGE_ADMIN_URL",
+        "GARAGE_ADMIN_TOKEN"
+      ],
+      "sys": [
+        // for aws-sdk
+        "osRelease"
+      ]
+    }
+  }
+}
