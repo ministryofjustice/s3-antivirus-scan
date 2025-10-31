@@ -2,9 +2,9 @@ name: "Test"
 
 # Controls when the workflow will run
 on:
-  workflow_call:
   pull_request:
     branches: ['main']
+  # workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
