@@ -1,9 +1,8 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts",
-    "test": "deno test --permission-set=test",
     "init-garage": "deno run --permission-set=init-garage garage/init-garage.ts",
-    "test-with-garage": "deno run init-garage && deno run test"
+    "test:e2e": "deno test --permission-set=test",
+    "test:e2e-with-init": "deno run init-garage && deno run test:e2e"
   },
   "imports": {
     "@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@^3.917.0",

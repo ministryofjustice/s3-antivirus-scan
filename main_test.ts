@@ -103,4 +103,11 @@ Deno.test("main function runs without errors", async () => {
 //     infected: 1,
 //     errors: 1,
 //   });
+  // intentionally fail
+  assertEquals(summary, {
+    processed: 6,
+    cleaned: 5,
+    infected: 1,
+    errors: 1,
+  });
 });

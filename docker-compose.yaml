@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/home/deno/app
-    command: ["deno", "run", "test-with-garage", "--watch"]
+    command: ["deno", "run", "test:e2e-with-init", "--watch"]
     environment:
       - S3_ENDPOINT=http://garage:3900
       - S3_REGION=garage
