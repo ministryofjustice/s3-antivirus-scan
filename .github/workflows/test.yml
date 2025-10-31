@@ -18,7 +18,4 @@ jobs:
 
     - name: Run tests
       run: |
-        # Change ownership of project files to user 1000
-        # sudo chown -R 1000:1000 .
-
         docker compose run --rm deno sh -c "deno run test:e2e-with-init"
