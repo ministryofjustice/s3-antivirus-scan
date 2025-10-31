@@ -16,28 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
-    - name: Cache Deno dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/deno
-        key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/deno.jsonc') }}
-        restore-keys: |
-          ${{ runner.os }}-deno-
-
-    - name: Pull Docker images
-      run: docker compose pull
-
     - name: Run tests
       run: |
         # Change ownership of project files to user 1000
