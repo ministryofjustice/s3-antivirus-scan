@@ -16,7 +16,7 @@
 
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
-	"workspaceFolder": "/app",
+	"workspaceFolder": "/home/deno/app",
 
 	// Ensure dependent services are running alongside the development container.
 	"runServices": ["deno", "garage", "clamav"],

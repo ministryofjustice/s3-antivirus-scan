@@ -1,5 +1,5 @@
-import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
-import { streamToClamAv } from "./clam.ts";
+import { getObjectsForScanning, getReadableStreamForObject } from "./controllers/s3.ts";
+import { streamToClamAv } from "./controllers/clam.ts";
 
 export const main = async () => {
 

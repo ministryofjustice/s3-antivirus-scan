@@ -30,8 +30,7 @@ export class GarageInitializer {
 
   constructor() {
     // Default to garage service name when in Docker, localhost otherwise
-    const defaultUrl = Deno.env.get("S3_ENDPOINT") ? "http://garage:3903" : "http://localhost:3903";
-    this.adminUrl = Deno.env.get("GARAGE_ADMIN_URL") || defaultUrl;
+    this.adminUrl = Deno.env.get("GARAGE_ADMIN_URL") || 'http://garage:3903';
     this.adminToken = Deno.env.get("GARAGE_ADMIN_TOKEN") || "test-admin-token-not-for-production";
   }
 
@@ -218,8 +217,8 @@ export class GarageInitializer {
       // Get updated status for layout version
       const updatedStatus = await this.getStatus();
       
-      // Apply layout
-      await this.applyLayout(updatedStatus.layoutVersion);
+  // Apply layout using the next version returned by the server.
+  await this.applyLayout(updatedStatus.layoutVersion + 1);
       
       console.log("🎉 Garage cluster initialized successfully!");
     }
@@ -265,5 +264,17 @@ export class GarageInitializer {
     console.log("\n🌐 S3 API endpoint:", this.adminUrl.replace("3903", "3900"));
     console.log("⚙️  Admin API endpoint:", this.adminUrl);
     console.log(`🪣 Test bucket: ${bucketName}`);
+  }
+}
+
+// If this script is run directly, perform initialization
+if (import.meta.main) {
+  const initializer = new GarageInitializer();
+  try {
+    await initializer.initialize();
+    console.log("🎉 Garage S3 initialization finished successfully!");
+  } catch (error) {
+    console.error("❌ Garage S3 initialization failed:", error);
+    Deno.exit(1);
   }
 }

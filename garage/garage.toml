@@ -28,22 +28,13 @@ rpc_public_addr = "127.0.0.1:3901"
 # Enable world-readable secrets for development only
 allow_world_readable_secrets = true
 
-# Automatic metadata snapshots every 6 hours (recommended for SQLite/LMDB)
-metadata_auto_snapshot_interval = "6h"
-
 # S3 API configuration
 [s3_api]
 s3_region = "garage"
 api_bind_addr = "[::]:3900"  # Bind to all interfaces in Docker
 root_domain = ".s3.garage.localhost"
 
-# S3 Web interface configuration  
-[s3_web]
-bind_addr = "[::]:3902"  # Bind to all interfaces in Docker
-root_domain = ".web.garage.localhost"
-
 # Administration API configuration
 [admin]
 api_bind_addr = "[::]:3903"  # Bind to all interfaces in Docker
 admin_token = "test-admin-token-not-for-production"
-metrics_token = "test-metrics-token-not-for-production"

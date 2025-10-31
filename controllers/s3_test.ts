@@ -1,6 +1,6 @@
 import { assertEquals, assertExists, assertGreater } from "@std/assert";
 
-import { GarageInitializer } from "./init-garage.ts";
+// import { GarageInitializer } from "./init-garage.ts";
 import {
   getObjectsForScanning,
   getReadableStreamForObject,

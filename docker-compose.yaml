@@ -1,75 +1,45 @@
 services:
-  # Garage S3-compatible storage server
-  garage:
-    image: dxflrs/garage:v2.1.0
-    container_name: garage-s3
-    environment:
-      # Override configuration with environment variables
-      - GARAGE_RPC_SECRET=4425f5c26c5e11581d3223904324dcb5b5d5dfb14e5e7f35e38c595424f5f1e6
-      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
-      - GARAGE_METRICS_TOKEN=test-metrics-token-not-for-production
-      - GARAGE_ALLOW_WORLD_READABLE_SECRETS=true
-    ports:
-      - "3900:3900"  # S3 API
-      - "3901:3901"  # RPC (cluster communication)
-      - "3902:3902"  # S3 Web interface
-      - "3903:3903"  # Admin API
-    volumes:
-      - ./garage.toml:/etc/garage.toml:ro
-      - ./init-garage.sh:/usr/local/bin/init-garage.sh:ro
-      - garage-meta:/tmp/garage_test/meta
-      - garage-data:/tmp/garage_test/data
-    healthcheck:
-      test: ["CMD", "/garage", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
 
-  # Deno application for AV scanning
+  # Deno application
   deno:
     build:
       dockerfile: Dockerfile
-    container_name: s3-av-scan
-    working_dir: /app
     volumes:
-      - .:/app
-    ports:
-      - "1993:1993"  # Application port
-    command: ["deno", "run", "test", "--watch"]
+      - .:/home/deno/app
+    command: ["deno", "run", "test-with-garage", "--watch"]
+    environment:
+      - S3_ENDPOINT=http://garage:3900
+      - S3_REGION=garage
+      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
     depends_on:
       garage:
         condition: service_healthy
       clamav:
         condition: service_healthy
-    environment:
-      - S3_ENDPOINT=http://garage:3900
-      - S3_REGION=garage
-      - GARAGE_ADMIN_URL=http://garage:3903
-      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
-      - CLAMAV_HOST=clamav
-      - CLAMAV_PORT=3310
 
+  # S3-compatible storage server
+  garage:
+    image: dxflrs/garage:v2.1.0
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    environment:
+      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      timeout: 10s
+
+  # ClamAV antivirus service
   clamav:
     image: clamav/clamav:stable
     platform: linux/amd64
-    environment:
-      FRESHCLAM_CHECKS: "12" # ~every 2 hours
     volumes:
       - clam-db:/var/lib/clamav
     user: clamav
     entrypoint: /init-unprivileged
     healthcheck:
       test: ["CMD-SHELL", "clamdscan --no-summary /etc/hosts >/dev/null 2>&1"]
-      interval: 30s
       timeout: 5s
-      retries: 10
       start_period: 120s
 
 volumes:
-  garage-data:
-    driver: local
-  garage-meta:
-    driver: local
   clam-db:
-    driver: local
