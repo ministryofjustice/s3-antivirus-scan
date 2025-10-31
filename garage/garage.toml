@@ -1,0 +1,40 @@
+# Garage configuration for S3 AV scanning setup
+# Based on Garage documentation: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/
+
+# Cluster configuration - single node setup for development
+replication_factor = 1
+consistency_mode = "consistent"
+
+# Storage configuration - use Docker volume mounts
+metadata_dir = "/tmp/garage_test/meta"
+data_dir = "/tmp/garage_test/data"
+metadata_fsync = false
+data_fsync = false
+
+# Database engine - SQLite is fine for development/testing
+# For production, consider switching to "lmdb"
+db_engine = "sqlite"
+
+# Block and performance configuration
+block_size = "1M"
+compression_level = 1
+block_ram_buffer_max = "256MiB"
+
+# RPC configuration - required for cluster communication
+rpc_secret = "4425f5c26c5e11581d3223904324dcb5b5d5dfb14e5e7f35e38c595424f5f1e6"
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+
+# Enable world-readable secrets for development only
+allow_world_readable_secrets = true
+
+# S3 API configuration
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"  # Bind to all interfaces in Docker
+root_domain = ".s3.garage.localhost"
+
+# Administration API configuration
+[admin]
+api_bind_addr = "[::]:3903"  # Bind to all interfaces in Docker
+admin_token = "test-admin-token-not-for-production"

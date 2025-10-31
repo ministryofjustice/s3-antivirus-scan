@@ -1,0 +1,45 @@
+services:
+
+  # Deno application
+  deno:
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/deno/app
+    command: ["deno", "run", "test:e2e-with-init", "--watch"]
+    environment:
+      - S3_ENDPOINT=http://garage:3900
+      - S3_REGION=garage
+      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
+    depends_on:
+      garage:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+
+  # S3-compatible storage server
+  garage:
+    image: dxflrs/garage:v2.1.0
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    environment:
+      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      timeout: 10s
+
+  # ClamAV antivirus service
+  clamav:
+    image: clamav/clamav:stable
+    platform: linux/amd64
+    volumes:
+      - clam-db:/var/lib/clamav
+    user: clamav
+    entrypoint: /init-unprivileged
+    healthcheck:
+      test: ["CMD-SHELL", "clamdscan --no-summary /etc/hosts >/dev/null 2>&1"]
+      timeout: 5s
+      start_period: 120s
+
+volumes:
+  clam-db:
