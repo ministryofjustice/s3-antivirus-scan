@@ -1,7 +1,10 @@
 name: "Build and Deploy to Github Container Registry"
 
 on:
-  workflow_call:
+  push:
+    branches: ['main']
+  release:
+    types: [published]
 
 jobs:
   build-and-push:
