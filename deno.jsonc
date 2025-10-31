@@ -3,7 +3,7 @@
     "init-garage": "deno run --permission-set=init-garage garage/init-garage.ts",
     "test:e2e": "deno test --permission-set=test",
     "test:e2e-with-init": "deno run init-garage && deno run test:e2e",
-    "production": "deno run main.ts"
+    "production": "deno run --permission-set=production main.ts"
   },
   "imports": {
     "@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@^3.917.0",
@@ -11,18 +11,19 @@
     "@std/assert": "jsr:@std/assert@^1.0.15"
   },
   "permissions": {
-    "default": {
+    "production": {
       "env": [
-        // Custom ENV vars
         "CLAMAV_HOST",
         "CLAMAV_PORT",
         "S3_ENDPOINT"
       ],
-      "net": []
+      "net": [
+        "clamav:3310"
+        // The actual s3 bucket name?
+      ]
     },
     "test": {
       "env": [
-        // Custom ENV vars
         "CLAMAV_HOST",
         "CLAMAV_PORT",
         "S3_ENDPOINT"
