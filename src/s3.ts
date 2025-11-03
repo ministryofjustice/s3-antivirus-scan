@@ -6,7 +6,9 @@ import {
 import { Credentials, webIdentityTokenProvider } from "./aws.ts";
 
 // If we dont have the environment variables, we should throw an error
-if (!Deno.env.get("S3_ENDPOINT") ||  !Deno.env.get("S3_REGION") || !Deno.env.get("S3_BUCKET")
+if (
+  !Deno.env.get("S3_ENDPOINT") || !Deno.env.get("S3_REGION") ||
+  !Deno.env.get("S3_BUCKET")
 ) {
   throw new Error("Missing required S3 environment variables");
 }
@@ -23,9 +25,8 @@ async function getS3Client(): Promise<S3Client> {
     region: Deno.env.get("S3_REGION")!,
     bucket: Deno.env.get("S3_BUCKET")!,
   };
-  
-  if (Deno.env.get("NODE_ENV") === "test") {
 
+  if (Deno.env.get("NODE_ENV") === "test") {
     if (
       !Deno.env.get("S3_ACCESS_KEY_ID") ||
       !Deno.env.get("S3_SECRET_ACCESS_KEY")
@@ -70,51 +71,42 @@ export const getObjectsForScanning = async ({
   // Create an empty set to hold files needing scanning
   const filesToScan = new Set<string>();
 
-  try {
-    const client = await getS3Client();
-    console.log(`Listing objects in bucket: ${Deno.env.get("S3_BUCKET")}`);
+  const client = await getS3Client();
+  console.log(`Listing objects in bucket: ${Deno.env.get("S3_BUCKET")}`);
 
-    for await (const obj of client.listObjects()) {
-      if (!obj.key) {
-        console.log("Skipping object with no Key");
-        continue;
-      }
-
-      // Skip folder-like objects (keys ending with '/')
-      if (obj.key.endsWith("/")) {
-        console.log(`Skipping folder-like object: ${obj.key}`);
-        continue;
-      }
-
-      // Skip files that are too large for ClamAV INSTREAM
-      if (obj.size && obj.size > maxFileSize) {
-        console.log(`Skipping large file: ${obj.key} (${obj.size} bytes, max: ${maxFileSize})`);
-        continue;
-      }
-
-      console.log(`Found object for scanning: ${obj.key} (${obj.size || 'unknown'} bytes)`);
-      filesToScan.add(obj.key);
-
-      // If a limit is set and we've reached it, break out of the loop
-      if (limit && filesToScan.size >= limit) {
-        break;
-      }
+  for await (const obj of client.listObjects()) {
+    if (!obj.key) {
+      console.log("Skipping object with no Key");
+      continue;
     }
 
-    console.log(`Found ${filesToScan.size} objects to scan`);
-    return filesToScan;
-  } catch (error) {
-    console.error("Error listing objects for scanning:", error);
-
-    // If it's a "NoSuchKey" error, it might mean the bucket is empty or the prefix doesn't exist
-    if (error.code === "NoSuchKey") {
-      console.log("No objects found in bucket (bucket may be empty)");
-      return filesToScan; // Return empty set
+    // Skip folder-like objects (keys ending with '/')
+    if (obj.key.endsWith("/")) {
+      console.log(`Skipping folder-like object: ${obj.key}`);
+      continue;
     }
 
-    // Re-throw other errors
-    throw error;
+    // Skip files that are too large for ClamAV INSTREAM
+    if (obj.size && obj.size > maxFileSize) {
+      console.log(
+        `Skipping large file: ${obj.key} (${obj.size} bytes, max: ${maxFileSize})`,
+      );
+      continue;
+    }
+
+    console.log(
+      `Found object for scanning: ${obj.key} (${obj.size || "unknown"} bytes)`,
+    );
+    filesToScan.add(obj.key);
+
+    // If a limit is set and we've reached it, break out of the loop
+    if (limit && filesToScan.size >= limit) {
+      break;
+    }
   }
+
+  console.log(`Found ${filesToScan.size} objects to scan`);
+  return filesToScan;
 };
 
 // Return readable stream for an object

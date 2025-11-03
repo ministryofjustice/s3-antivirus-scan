@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { S3Client } from "@bradenmacdonald/s3-lite-client";
 import { main } from "./main.ts";
-import {s3Config} from "./config.ts";
+import { s3Config } from "./config.ts";
 
 const getClient = () => {
   return new S3Client(s3Config);
@@ -53,7 +53,8 @@ Deno.test.beforeAll(async () => {
     },
     {
       Key: "infected-file.txt",
-      Body: 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*',
+      Body:
+        "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*",
       Metadata: {
         "x-amz-meta-clam-av-timestamp": new Date().toISOString(),
       },
@@ -90,10 +91,15 @@ Deno.test.afterAll(async () => {
 
 Deno.test("main function runs without errors", async () => {
   const summary = await main();
-//   assertEquals(summary, {
-//     processed: 6,
-//     cleaned: 4,
-//     infected: 1,
-//     errors: 1,
-//   });
+  assertEquals(summary.counts, { success: 5, infected: 1, errors: 0 });
+  assertEquals(summary.results, [
+    {
+      objectKey: "infected-file.txt",
+      clamAVResponse: {
+        isInfected: true,
+        virusName: "Eicar-Test-Signature",
+      },
+    },
+  ]);
+  assertEquals(summary.durationSeconds, 0);
 });

@@ -1,12 +1,9 @@
 import { assertEquals, assertExists, assertGreater } from "@std/assert";
 import { S3Client } from "@bradenmacdonald/s3-lite-client";
 
-import {
-  getObjectsForScanning,
-  getReadableStreamForObject,
-} from "./s3.ts";
+import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
 
-import {s3Config} from "./config.ts";
+import { s3Config } from "./config.ts";
 
 const getClient = () => {
   return new S3Client(s3Config);
