@@ -1,11 +1,8 @@
-import {webIdentityTokenProvider} from "./aws.ts";
+
 import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
 import { streamToClamAv } from "./clam.ts";
 
 export const main = async () => {
-
-  const credentials = await webIdentityTokenProvider();
-  console.log("Retrieved AWS credentials:", credentials);
 
   const objectsToScan = await getObjectsForScanning();
 
