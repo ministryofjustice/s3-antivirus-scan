@@ -30,6 +30,7 @@ async function getS3Client(): Promise<S3Client> {
   // Check if we need new credentials
   if (!cachedCredentials || (now.getTime() + bufferTime) >= cachedCredentials.expiration.getTime()) {
     console.log("Refreshing AWS credentials...");
+    console.log({s3Config});
     cachedCredentials = await webIdentityTokenProvider();
 
     // Create new client with fresh credentials
