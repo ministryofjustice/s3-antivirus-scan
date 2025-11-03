@@ -40,7 +40,6 @@ export const main = async () => {
       console.error(`Error scanning object ${objectKey}:`, error);
       responses.push({
         objectKey,
-        clamAVResponse,
         error,
       });
     }
