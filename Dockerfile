@@ -11,12 +11,12 @@ USER deno
 
 # Copy the source files.
 COPY ./deno* ./*.ts ./
-COPY ./controllers/*.ts ./controllers/
+COPY ./src/*.ts ./src/
 
 # Install Deno dependencies.
 RUN deno install
 
 # Compile the main app so that it doesn't need to be compiled each startup/entry.
-RUN deno cache main.ts
+RUN deno cache src/main.ts
 
 CMD [ "task", "production" ]

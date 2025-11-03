@@ -1,7 +1,11 @@
-import { getObjectsForScanning, getReadableStreamForObject } from "./controllers/s3.ts";
-import { streamToClamAv } from "./controllers/clam.ts";
+import {webIdentityTokenProvider} from "./aws.ts";
+import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
+import { streamToClamAv } from "./clam.ts";
 
 export const main = async () => {
+
+  const credentials = await webIdentityTokenProvider();
+  console.log("Retrieved AWS credentials:", credentials);
 
   const objectsToScan = await getObjectsForScanning();
 
@@ -30,3 +34,8 @@ export const main = async () => {
 
   return responses;
 };
+
+// If the file is called directly, then run the main function
+if (import.meta.main) {
+  main().catch(console.error);
+}

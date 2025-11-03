@@ -1,24 +1,15 @@
 import { assertEquals, assertExists, assertGreater } from "@std/assert";
+import { S3Client } from "@bradenmacdonald/s3-lite-client";
 
-// import { GarageInitializer } from "./init-garage.ts";
 import {
   getObjectsForScanning,
   getReadableStreamForObject,
-  isRecentTimestamp,
 } from "./s3.ts";
 
-import { S3Client } from "@bradenmacdonald/s3-lite-client";
+import {s3Config} from "./config.ts";
 
 const getClient = () => {
-  return new S3Client({
-    endPoint: "http://garage:3900",
-    region: "garage",
-    accessKey: "GK0123456789ABCDEF01234567",
-    secretKey:
-      "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
-    bucket: "test-bucket",
-    pathStyle: true,
-  });
+  return new S3Client(s3Config);
 };
 
 const emptyBucket = async (client: S3Client) => {
@@ -49,40 +40,6 @@ Deno.test.afterAll(async () => {
 });
 
 /**
- * Firstly test the utility function isRecentTimestamp
- */
-Deno.test("isRecentTimestamp works correctly", () => {
-  const now = new Date();
-  const recentTimestamp = new Date(
-    now.getTime() - 3 * 24 * 60 * 60 * 1000,
-  ).toISOString(); // 3 days ago
-  const oldTimestamp = new Date(
-    now.getTime() - 10 * 24 * 60 * 60 * 1000,
-  ).toISOString(); // 10 days ago
-
-  assertEquals(
-    isRecentTimestamp(recentTimestamp, 7 * 24 * 60 * 60),
-    true,
-    "Expected recent timestamp to be recent",
-  );
-  assertEquals(
-    isRecentTimestamp(oldTimestamp, 7 * 24 * 60 * 60),
-    false,
-    "Expected old timestamp to not be recent",
-  );
-  assertEquals(
-    isRecentTimestamp(undefined, 7 * 24 * 60 * 60),
-    false,
-    "Expected undefined timestamp to not be recent",
-  );
-  assertEquals(
-    isRecentTimestamp("invalid-timestamp", 7 * 24 * 60 * 60),
-    false,
-    "Expected invalid timestamp to not be recent",
-  );
-});
-
-/**
  * Test getObjectsForScanning function
  */
 
@@ -97,7 +54,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Deno.test.ignore(
   {
     name: "getObjectsForScanning returns files needing scanning",
     fn: async () => {

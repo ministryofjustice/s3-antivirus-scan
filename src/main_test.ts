@@ -1,17 +1,10 @@
 import { assertEquals } from "@std/assert";
 import { S3Client } from "@bradenmacdonald/s3-lite-client";
 import { main } from "./main.ts";
+import {s3Config} from "./config.ts";
 
 const getClient = () => {
-  return new S3Client({
-    endPoint: "http://garage:3900",
-    region: "garage",
-    accessKey: "GK0123456789ABCDEF01234567",
-    secretKey:
-      "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
-    bucket: "test-bucket",
-    pathStyle: true,
-  });
+  return new S3Client(s3Config);
 };
 
 const emptyBucket = async (client: S3Client) => {

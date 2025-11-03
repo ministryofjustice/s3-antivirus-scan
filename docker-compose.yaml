@@ -7,10 +7,8 @@ services:
     volumes:
       - .:/home/deno/app
     command: ["deno", "run", "test:e2e-with-init", "--watch"]
-    environment:
-      - S3_ENDPOINT=http://garage:3900
-      - S3_REGION=garage
-      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
+    env_file:
+      - test.env
     depends_on:
       garage:
         condition: service_healthy
@@ -22,8 +20,8 @@ services:
     image: dxflrs/garage:v2.1.0
     volumes:
       - ./garage/garage.toml:/etc/garage.toml:ro
-    environment:
-      - GARAGE_ADMIN_TOKEN=test-admin-token-not-for-production
+    env_file:
+      - test.env
     healthcheck:
       test: ["CMD", "/garage", "status"]
       timeout: 10s

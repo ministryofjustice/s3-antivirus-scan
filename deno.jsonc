@@ -1,9 +1,9 @@
 {
   "tasks": {
     "init-garage": "deno run --permission-set=init-garage garage/init-garage.ts",
-    "test:e2e": "deno test --permission-set=test",
+    "test:e2e": "NODE_ENV=test deno test --permission-set=test",
     "test:e2e-with-init": "deno run init-garage && deno run test:e2e",
-    "production": "deno run main.ts"
+    "production": "deno run --permission-set=production --allow-net=\"clamav:3310,$S3_HOSTNAME\" src/main.ts"
   },
   "imports": {
     "@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@^3.917.0",
@@ -11,21 +11,28 @@
     "@std/assert": "jsr:@std/assert@^1.0.15"
   },
   "permissions": {
-    "default": {
+    "production": {
       "env": [
-        // Custom ENV vars
+        "NODE_ENV",
         "CLAMAV_HOST",
         "CLAMAV_PORT",
-        "S3_ENDPOINT"
-      ],
-      "net": []
+        "AWS_ROLE_ARN",
+        "AWS_WEB_IDENTITY_TOKEN_FILE",
+        "S3_ENDPOINT",
+        "S3_REGION",
+        "S3_BUCKET"
+      ]
     },
     "test": {
       "env": [
-        // Custom ENV vars
+        "NODE_ENV",
         "CLAMAV_HOST",
         "CLAMAV_PORT",
-        "S3_ENDPOINT"
+        "S3_ENDPOINT",
+        "S3_REGION",
+        "S3_BUCKET",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY"
       ],
       "net": [
         "clamav:3310",
@@ -35,7 +42,10 @@
     "init-garage": {
       "env": [
         "GARAGE_ADMIN_URL",
-        "GARAGE_ADMIN_TOKEN"
+        "GARAGE_ADMIN_TOKEN",
+        "S3_BUCKET",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY"
       ],
       "net": [
         "garage:3903"
