@@ -5,6 +5,14 @@ import {
 
 import { Credentials, webIdentityTokenProvider } from "./aws.ts";
 
+// If we dont have the environment variables, we should throw an error
+if (
+  !Deno.env.get("S3_ENDPOINT") || !Deno.env.get("S3_REGION") ||
+  !Deno.env.get("S3_BUCKET")
+) {
+  throw new Error("Missing required S3 environment variables");
+}
+
 let cachedCredentials: Credentials | null = null;
 let s3Client: S3Client | null = null;
 
@@ -13,14 +21,14 @@ async function getS3Client(): Promise<S3Client> {
   const now = new Date();
 
   const s3Config: S3ClientOptions = {
-    endPoint: Deno.env.get("S3_ENDPOINT")!,
     region: Deno.env.get("S3_REGION")!,
     bucket: Deno.env.get("S3_BUCKET")!,
   };
-
+  
   if (Deno.env.get("NODE_ENV") === "test") {
     return new S3Client({
       ...s3Config,
+      endPoint: Deno.env.get("S3_ENDPOINT")!,
       accessKey: Deno.env.get("S3_ACCESS_KEY_ID"),
       secretKey: Deno.env.get("S3_SECRET_ACCESS_KEY"),
       pathStyle: true,
@@ -28,9 +36,12 @@ async function getS3Client(): Promise<S3Client> {
   }
 
   // Check if we need new credentials
-  if (!cachedCredentials || (now.getTime() + bufferTime) >= cachedCredentials.expiration.getTime()) {
+  if (
+    !cachedCredentials ||
+    (now.getTime() + bufferTime) >= cachedCredentials.expiration.getTime()
+  ) {
     console.log("Refreshing AWS credentials...");
-    console.log({s3Config});
+    console.log({ s3Config });
     cachedCredentials = await webIdentityTokenProvider();
 
     // Create new client with fresh credentials
@@ -54,7 +65,7 @@ export const getObjectsForScanning = async ({
   try {
     const client = await getS3Client();
     console.log(`Listing objects in bucket: ${Deno.env.get("S3_BUCKET")}`);
-    
+
     for await (const obj of client.listObjects()) {
       if (!obj.key) {
         console.log("Skipping object with no Key");
@@ -62,7 +73,7 @@ export const getObjectsForScanning = async ({
       }
 
       // Skip folder-like objects (keys ending with '/')
-      if (obj.key.endsWith('/')) {
+      if (obj.key.endsWith("/")) {
         console.log(`Skipping folder-like object: ${obj.key}`);
         continue;
       }
@@ -80,13 +91,13 @@ export const getObjectsForScanning = async ({
     return filesToScan;
   } catch (error) {
     console.error("Error listing objects for scanning:", error);
-    
+
     // If it's a "NoSuchKey" error, it might mean the bucket is empty or the prefix doesn't exist
     if (error.code === "NoSuchKey") {
       console.log("No objects found in bucket (bucket may be empty)");
       return filesToScan; // Return empty set
     }
-    
+
     // Re-throw other errors
     throw error;
   }
