@@ -1,9 +1,12 @@
 import {
   S3Client,
   type S3ClientOptions,
+  type S3ObjectStatus,
 } from "@bradenmacdonald/s3-lite-client";
 
 import { Credentials, webIdentityTokenProvider } from "./aws.ts";
+
+export type { S3ObjectStatus };
 
 // If we dont have the environment variables, we should throw an error
 if (
@@ -107,6 +110,13 @@ export const getObjectsForScanning = async ({
 
   console.log(`Found ${filesToScan.size} objects to scan`);
   return filesToScan;
+};
+
+export const getObjectStatus = async (
+  key: string,
+): Promise<S3ObjectStatus> => {
+  const client = await getS3Client();
+  return client.statObject(key);
 };
 
 // Return readable stream for an object

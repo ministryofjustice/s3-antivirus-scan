@@ -1,4 +1,9 @@
-import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
+import {
+  getObjectsForScanning,
+  getObjectStatus,
+  getReadableStreamForObject,
+  type S3ObjectStatus,
+} from "./s3.ts";
 import { streamToClamAv } from "./clam.ts";
 
 export const main = async () => {
@@ -6,6 +11,7 @@ export const main = async () => {
   const summary = {
     counts: {
       success: 0,
+      clean: 0,
       infected: 0,
       errors: 0,
     },
@@ -13,6 +19,7 @@ export const main = async () => {
       objectKey: string;
       clamAVResponse?: { isInfected: boolean; virusName?: string };
       error?: unknown;
+      objectStatus?: S3ObjectStatus;
     }>,
     durationSeconds: 0,
   };
@@ -48,6 +55,11 @@ export const main = async () => {
       const clamAVResponse = await streamToClamAv(stream);
 
       summary.counts.success++;
+
+      if (!clamAVResponse.isInfected) {
+        summary.counts.clean++;
+      }
+
       if (clamAVResponse.isInfected) {
         summary.counts.infected++;
         summary.results.push({
@@ -69,6 +81,7 @@ export const main = async () => {
       summary.results.push({
         objectKey,
         error,
+        objectStatus: await getObjectStatus(objectKey),
       });
     }
   }

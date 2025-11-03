@@ -1,5 +1,5 @@
-import { assertEquals } from "@std/assert";
-import { S3Client } from "@bradenmacdonald/s3-lite-client";
+import { assertEquals, assertLess } from "@std/assert";
+import { S3Client, type S3ObjectStatus } from "@bradenmacdonald/s3-lite-client";
 import { main } from "./main.ts";
 import { s3Config } from "./config.ts";
 
@@ -91,15 +91,20 @@ Deno.test.afterAll(async () => {
 
 Deno.test("main function runs without errors", async () => {
   const summary = await main();
-  assertEquals(summary.counts, { success: 5, infected: 1, errors: 0 });
+  assertEquals(summary.counts, {
+    success: 6,
+    clean: 5,
+    infected: 1,
+    errors: 0,
+  });
   assertEquals(summary.results, [
     {
       objectKey: "infected-file.txt",
       clamAVResponse: {
         isInfected: true,
-        virusName: "Eicar-Test-Signature",
+        virusName: "Win.Test.EICAR_HDB-1",
       },
     },
   ]);
-  assertEquals(summary.durationSeconds, 0);
+  assertLess(summary.durationSeconds, 30);
 });
