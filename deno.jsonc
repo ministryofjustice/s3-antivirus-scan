@@ -16,7 +16,7 @@
         "NODE_ENV",
         "CLAMAV_HOST",
         "CLAMAV_PORT",
-        "CLAMAV_CLAMAV_MAX_FILE_SIZE",
+        "CLAMAV_MAX_FILE_SIZE",
         "AWS_ROLE_ARN",
         "AWS_WEB_IDENTITY_TOKEN_FILE",
         "S3_ENDPOINT",
