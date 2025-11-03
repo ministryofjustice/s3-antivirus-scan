@@ -65,7 +65,8 @@ async function getS3Client(): Promise<S3Client> {
 
 export const getObjectsForScanning = async ({
   limit,
-}: { limit?: number } = {}): Promise<Set<string>> => {
+  maxFileSize = 25 * 1024 * 1024, // 25MB default ClamAV INSTREAM limit
+}: { limit?: number; maxFileSize?: number } = {}): Promise<Set<string>> => {
   // Create an empty set to hold files needing scanning
   const filesToScan = new Set<string>();
 
@@ -85,7 +86,13 @@ export const getObjectsForScanning = async ({
         continue;
       }
 
-      console.log(`Found object for scanning: ${obj.key}`);
+      // Skip files that are too large for ClamAV INSTREAM
+      if (obj.size && obj.size > maxFileSize) {
+        console.log(`Skipping large file: ${obj.key} (${obj.size} bytes, max: ${maxFileSize})`);
+        continue;
+      }
+
+      console.log(`Found object for scanning: ${obj.key} (${obj.size || 'unknown'} bytes)`);
       filesToScan.add(obj.key);
 
       // If a limit is set and we've reached it, break out of the loop

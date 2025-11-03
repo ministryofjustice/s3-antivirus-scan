@@ -3,8 +3,10 @@ import { getObjectsForScanning, getReadableStreamForObject } from "./s3.ts";
 import { streamToClamAv } from "./clam.ts";
 
 export const main = async () => {
+  // Configure max file size from environment variable (default 25MB)
+  const maxFileSize = parseInt(Deno.env.get("CLAMAV_MAX_FILE_SIZE") || "26214400"); // 25MB in bytes
 
-  const objectsToScan = await getObjectsForScanning();
+  const objectsToScan = await getObjectsForScanning({ maxFileSize });
 
   if (objectsToScan.size === 0) {
     console.log("No objects found to scan. The bucket may be empty or no objects match the scanning criteria.");
