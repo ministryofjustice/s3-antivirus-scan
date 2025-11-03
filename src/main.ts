@@ -27,14 +27,24 @@ export const main = async () => {
 
     // Send the stream to ClamAV for scanning
 
-    const clamAVResponse = await streamToClamAv(stream);
+    try {
 
-    responses.push({
-      objectKey,
-      clamAVResponse,
-    });
+      const clamAVResponse = await streamToClamAv(stream);
+      responses.push({
+        objectKey,
+        clamAVResponse,
+      });
+  
+      console.log(`Scanned object: ${objectKey}, Result: ${clamAVResponse.isInfected ? `Infected (${clamAVResponse.virusName})` : "Clean"}`);
+    } catch (error) {
+      console.error(`Error scanning object ${objectKey}:`, error);
+      responses.push({
+        objectKey,
+        clamAVResponse,
+        error,
+      });
+    }
 
-    console.log(`Scanned object: ${objectKey}, Result: ${clamAVResponse.isInfected ? `Infected (${clamAVResponse.virusName})` : "Clean"}`);
   }
 
   console.log("Scanning complete:", responses);
