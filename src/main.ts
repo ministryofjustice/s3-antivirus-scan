@@ -33,6 +33,8 @@ export const main = async () => {
       objectKey,
       clamAVResponse,
     });
+
+    console.log(`Scanned object: ${objectKey}, Result: ${clamAVResponse.isInfected ? `Infected (${clamAVResponse.virusName})` : "Clean"}`);
   }
 
   console.log("Scanning complete:", responses);
