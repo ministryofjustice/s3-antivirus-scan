@@ -6,6 +6,12 @@ export const main = async () => {
 
   const objectsToScan = await getObjectsForScanning();
 
+  if (objectsToScan.size === 0) {
+    console.log("No objects found to scan. The bucket may be empty or no objects match the scanning criteria.");
+    return [];
+  }
+
+  console.log(`Starting scan of ${objectsToScan.size} objects`);
   const responses = [];
 
   // Now we have an array of files that need to be scanned.

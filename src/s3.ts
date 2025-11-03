@@ -3,7 +3,6 @@ import {
   type S3ClientOptions,
 } from "@bradenmacdonald/s3-lite-client";
 
-import { s3Config } from "./config.ts";
 import { Credentials, webIdentityTokenProvider } from "./aws.ts";
 
 let cachedCredentials: Credentials | null = null;
@@ -51,21 +50,45 @@ export const getObjectsForScanning = async ({
   // Create an empty set to hold files needing scanning
   const filesToScan = new Set<string>();
 
-  for await (const obj of (await getS3Client()).listObjects()) {
-    if (!obj.key) {
-      console.log("Skipping object with no Key");
-      continue;
+  try {
+    const client = await getS3Client();
+    console.log(`Listing objects in bucket: ${Deno.env.get("S3_BUCKET")}`);
+    
+    for await (const obj of client.listObjects()) {
+      if (!obj.key) {
+        console.log("Skipping object with no Key");
+        continue;
+      }
+
+      // Skip folder-like objects (keys ending with '/')
+      if (obj.key.endsWith('/')) {
+        console.log(`Skipping folder-like object: ${obj.key}`);
+        continue;
+      }
+
+      console.log(`Found object for scanning: ${obj.key}`);
+      filesToScan.add(obj.key);
+
+      // If a limit is set and we've reached it, break out of the loop
+      if (limit && filesToScan.size >= limit) {
+        break;
+      }
     }
 
-    filesToScan.add(obj.key);
-
-    // If a limit is set and we've reached it, break out of the loop
-    if (limit && filesToScan.size >= limit) {
-      break;
+    console.log(`Found ${filesToScan.size} objects to scan`);
+    return filesToScan;
+  } catch (error) {
+    console.error("Error listing objects for scanning:", error);
+    
+    // If it's a "NoSuchKey" error, it might mean the bucket is empty or the prefix doesn't exist
+    if (error.code === "NoSuchKey") {
+      console.log("No objects found in bucket (bucket may be empty)");
+      return filesToScan; // Return empty set
     }
+    
+    // Re-throw other errors
+    throw error;
   }
-
-  return filesToScan;
 };
 
 // Return readable stream for an object
