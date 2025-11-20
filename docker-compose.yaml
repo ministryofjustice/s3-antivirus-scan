@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/home/deno/app
-    command: ["deno", "run", "test:e2e-with-init", "--watch"]
+    command: ["deno", "run", "test:with-init", "--watch"]
     env_file:
       - test.env
     depends_on:
@@ -32,6 +32,7 @@ services:
     platform: linux/amd64
     volumes:
       - clam-db:/var/lib/clamav
+      - ./clamd.conf:/etc/clamav/clamd.conf:ro
     user: clamav
     entrypoint: /init-unprivileged
     healthcheck:

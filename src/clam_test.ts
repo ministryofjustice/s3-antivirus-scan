@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects } from "jsr:@std/assert";
 import { streamToClamAv } from "./clam.ts";
 
 // Mock data for testing
@@ -90,27 +90,6 @@ Deno.test("streamToClamAv - large clean file", async () => {
   assertEquals(result.virusName, undefined);
 });
 
-// Deno.test("streamToClamAv - handles connection errors", async () => {
-//   // This test assumes ClamAV is not running or not accessible
-//   // We'll need to temporarily modify the connection details to test error handling
-
-//   const testStream = createTestStream("test content");
-
-//   let errorCaught = false;
-
-//   // This should reject if ClamAV is not accessible
-//   // The actual behavior depends on whether ClamAV is running
-//   try {
-//     await streamToClamAv(testStream);
-//   } catch (error) {
-//     // Expected if ClamAV is not running
-//     assertEquals(error instanceof Error, true);
-//     errorCaught = true;
-//   }
-
-//   assertEquals(errorCaught, true, "Expected connection error was not caught");
-// });
-
 Deno.test("streamToClamAv - handles multiple chunks", async () => {
   // Create a stream that emits multiple chunks
   const multiChunkStream = new ReadableStream({
@@ -155,31 +134,6 @@ Deno.test({
   sanitizeResources: true,
   sanitizeOps: true,
 });
-
-// // Integration test that requires both S3 and ClamAV
-// Deno.test("streamToClamAv - integration with S3 stream", async () => {
-//   // This test would require setting up test data in S3 first
-//   // For now, we'll skip this test unless in integration environment
-
-//   const isIntegrationEnv = Deno.env.get("INTEGRATION_TESTS") === "true";
-
-//   if (!isIntegrationEnv) {
-//     console.log("Skipping integration test - set INTEGRATION_TESTS=true to run");
-//     return;
-//   }
-
-//   // Import S3 functionality and test with actual S3 stream
-//   const { getReadableStreamForObject } = await import("./s3.ts");
-
-//   // Assume we have a test file in S3
-//   const testKey = "test-clean-file.txt";
-//   const s3Stream = await getReadableStreamForObject(testKey);
-
-//   if (s3Stream) {
-//     const result = await streamToClamAv(s3Stream);
-//     assertEquals(result.isInfected, false);
-//   }
-// });
 
 // Performance test for large files
 Deno.test({

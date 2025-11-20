@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@bradenmacdonald/s3-lite-client@~0.9.4": "0.9.4",
+    "jsr:@std/assert@*": "1.0.15",
     "jsr:@std/assert@^1.0.15": "1.0.15",
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "npm:@aws-sdk/client-s3@*": "3.917.0",

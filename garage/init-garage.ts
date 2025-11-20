@@ -122,8 +122,8 @@ export class GarageInitializer {
     // Garage requires accessKeyId to start with "GK" + exactly 12 hex-encoded bytes (24 hex chars)
     // Garage requires secretAccessKey to be exactly 32 hex-encoded bytes (64 hex chars)
     const credentials = {
-      accessKeyId: "GK0123456789ABCDEF01234567",
-      secretAccessKey: "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+      accessKeyId: Deno.env.get("S3_ACCESS_KEY_ID")!,
+      secretAccessKey: Deno.env.get("S3_SECRET_ACCESS_KEY")!
     };
     
     const response = await this.makeRequest("/v2/ImportKey", {
@@ -224,8 +224,8 @@ export class GarageInitializer {
     }
 
     // Create access key and bucket
-    const bucketName = "test-bucket";
-    const accessKeyId = "GK0123456789ABCDEF01234567";
+    const bucketName = Deno.env.get("S3_BUCKET")!;
+    const accessKeyId = Deno.env.get("S3_ACCESS_KEY_ID")!;
     
     // Ensure access key exists
     if (await this.keyExists(accessKeyId)) {

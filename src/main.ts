@@ -20,6 +20,7 @@ export const main = async () => {
       clamAVResponse?: { isInfected: boolean; virusName?: string };
       error?: unknown;
       objectStatus?: S3ObjectStatus;
+      durationSeconds?: number;
     }>,
     durationSeconds: 0,
   };
@@ -40,8 +41,12 @@ export const main = async () => {
 
   console.log(`Starting scan of ${objectsToScan.size} objects`);
 
+  let objectStartTime = 0;
+
   // Now we have an array of files that need to be scanned.
   for (const objectKey of objectsToScan) {
+    objectStartTime = Date.now();
+
     const stream = await getReadableStreamForObject(objectKey);
 
     if (!stream) {
@@ -82,6 +87,7 @@ export const main = async () => {
         objectKey,
         error,
         objectStatus: await getObjectStatus(objectKey),
+        durationSeconds: (Date.now() - objectStartTime) / 1000,
       });
     }
   }
