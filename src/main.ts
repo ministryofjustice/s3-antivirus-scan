@@ -5,6 +5,7 @@ import {
   type S3ObjectStatus,
 } from "./s3.ts";
 import { streamToClamAv } from "./clam.ts";
+import { failConfig } from "./config.ts";
 
 export const main = async () => {
   const startTime = Date.now();
@@ -14,6 +15,7 @@ export const main = async () => {
       success: 0,
       clean: 0,
       infected: 0,
+      skipped: 0,
       errors: 0,
     },
     results: [] as Array<{
@@ -34,6 +36,8 @@ export const main = async () => {
   const { objectKeys, aggregates } = await getObjectsForScanning({
     maxFileSize,
   });
+
+  summary.counts.skipped = aggregates.skippedCount;
 
   console.log("Scanning starting:", aggregates);
 
@@ -106,5 +110,28 @@ export const main = async () => {
 
 // If the file is called directly, then run the main function
 if (import.meta.main) {
-  main().catch(console.error);
+  const summary = await main();
+
+  if (
+    failConfig.failOnSkipped && summary.counts.skipped > 0
+  ) {
+    console.error(
+      `Detected ${summary.counts.skipped} object(s) skipped; exiting with code 1 due to CLAMAV_FAIL_ON_SKIPPED.`,
+    );
+    Deno.exit(1);
+  }
+
+  if (failConfig.failOnError && summary.counts.errors > 0) {
+    console.error(
+      `Detected ${summary.counts.errors} error(s) during scanning; exiting with code 1 due to CLAMAV_FAIL_ON_SCAN_ERROR.`,
+    );
+    Deno.exit(1);
+  }
+
+  if (failConfig.failOnInfected && summary.counts.infected > 0) {
+    console.error(
+      `Detected ${summary.counts.infected} infected object(s); exiting with code 1 due to CLAMAV_FAIL_ON_INFECTED.`,
+    );
+    Deno.exit(1);
+  }
 }

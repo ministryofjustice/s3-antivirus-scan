@@ -77,6 +77,7 @@ interface GetObjectsForScanningResult {
   aggregates: {
     totalSizeBytes: number;
     objectCount: number;
+    skippedCount: number;
   };
 }
 
@@ -90,6 +91,7 @@ export const getObjectsForScanning = async ({
   const aggregates = {
     totalSizeBytes: 0,
     objectCount: 0,
+    skippedCount: 0,
   };
 
   const client = await getS3Client();
@@ -112,11 +114,12 @@ export const getObjectsForScanning = async ({
       console.log(
         `Skipping large file: ${obj.key} (${obj.size} bytes, max: ${maxFileSize})`,
       );
+      aggregates.skippedCount++;
       continue;
     }
 
+    aggregates.objectCount++;
     aggregates.totalSizeBytes += obj.size || 0;
-    aggregates.objectCount += 1;
 
     objectKeys.add(obj.key);
 

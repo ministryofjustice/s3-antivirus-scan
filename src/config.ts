@@ -28,4 +28,17 @@ if (Deno.env.get("NODE_ENV") === "test") {
   s3Config.sessionToken = credentials.sessionToken;
 }
 
-export { s3Config };
+// Config, for how to handle scan results, should certain conditions trigger non-zero exit codes?
+const failConfig = {
+  failOnSkipped: ["1", "true", "yes", "on"].includes(
+    (Deno.env.get("FAIL_ON_SKIPPED") || "").toLowerCase(),
+  ),
+  failOnError: ["1", "true", "yes", "on"].includes(
+    (Deno.env.get("FAIL_ON_SCAN_ERROR") || "").toLowerCase(),
+  ),
+  failOnInfected: ["1", "true", "yes", "on"].includes(
+    (Deno.env.get("FAIL_ON_INFECTED") || "").toLowerCase(),
+  ),
+};
+
+export { failConfig, s3Config };
