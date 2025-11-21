@@ -7,7 +7,7 @@ spec:
   backoffLimit: 0
   template:
     spec:
-      serviceAccountName: justice-gov-uk-dev-av
+      serviceAccountName: s3-av-serviceaccount
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
