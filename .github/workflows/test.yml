@@ -19,5 +19,5 @@ jobs:
     - name: Run tests
       run: |
         docker compose up --wait --wait-timeout 300 minio clamav
-        docker compose up --wait minio-init
+        docker compose run --rm minio-init
         docker compose run --rm deno sh -c "deno run test"
