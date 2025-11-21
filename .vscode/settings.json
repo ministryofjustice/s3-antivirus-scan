@@ -2,5 +2,6 @@
     "deno.enable": true,
     "deno.lint": true,
     "typescript.preferences.includePackageJsonAutoImports": "auto",
-    "typescript.suggest.includeCompletionsForModuleExports": true
+    "typescript.suggest.includeCompletionsForModuleExports": true,
+    "editor.formatOnSave": true
 }

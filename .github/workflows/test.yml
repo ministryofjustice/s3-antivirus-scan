@@ -18,4 +18,6 @@ jobs:
 
     - name: Run tests
       run: |
-        docker compose run --rm deno sh -c "deno run test:e2e-with-init"
+        docker compose up --wait --wait-timeout 300 minio clamav
+        docker compose run --rm minio-init
+        docker compose run --rm deno sh -c "deno run test"
