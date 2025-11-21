@@ -18,4 +18,4 @@ jobs:
 
     - name: Run tests
       run: |
-        docker compose run --rm deno sh -c "deno run test:e2e-with-init"
+        docker compose run --rm deno sh -c "deno run test"

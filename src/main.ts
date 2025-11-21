@@ -8,6 +8,7 @@ import { streamToClamAv } from "./clam.ts";
 
 export const main = async () => {
   const startTime = Date.now();
+
   const summary = {
     counts: {
       success: 0,
@@ -30,21 +31,25 @@ export const main = async () => {
     Deno.env.get("CLAMAV_MAX_FILE_SIZE") || "26214400",
   ); // 25MB in bytes
 
-  const objectsToScan = await getObjectsForScanning({ maxFileSize });
+  const { objectKeys, aggregates } = await getObjectsForScanning({
+    maxFileSize,
+  });
 
-  if (objectsToScan.size === 0) {
+  console.log("Scanning starting:", aggregates);
+
+  if (objectKeys.size === 0) {
     console.log(
       "No objects found to scan. The bucket may be empty or no objects match the scanning criteria.",
     );
     return summary;
   }
 
-  console.log(`Starting scan of ${objectsToScan.size} objects`);
+  console.log(`Starting scan of ${objectKeys.size} objects`);
 
   let objectStartTime = 0;
 
   // Now we have an array of files that need to be scanned.
-  for (const objectKey of objectsToScan) {
+  for (const objectKey of objectKeys) {
     objectStartTime = Date.now();
 
     const stream = await getReadableStreamForObject(objectKey);

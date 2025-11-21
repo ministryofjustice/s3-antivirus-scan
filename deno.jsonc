@@ -1,8 +1,6 @@
 {
   "tasks": {
-    "init-garage": "deno run --permission-set=init-garage garage/init-garage.ts",
     "test": "NODE_ENV=test deno test --permission-set=test",
-    "test:with-init": "deno run init-garage && deno run test",
     "production": "deno run --permission-set=production --allow-net=\"clamav:3310,sts.amazonaws.com:443,$S3_HOSTNAME\" src/main.ts"
   },
   "imports": {
@@ -39,22 +37,12 @@
         "AWS_ROLE_ARN",
         "AWS_WEB_IDENTITY_TOKEN_FILE"
       ],
-      "net": ["clamav:3310", "garage:3900"],
+      "net": ["clamav:3310", "minio:9010"],
       "read": [
         "/var/run/secrets/eks.amazonaws.com/serviceaccount/token",
         "/tmp/deno"
       ],
       "write": ["/tmp/deno"]
-    },
-    "init-garage": {
-      "env": [
-        "GARAGE_ADMIN_URL",
-        "GARAGE_ADMIN_TOKEN",
-        "S3_BUCKET",
-        "S3_ACCESS_KEY_ID",
-        "S3_SECRET_ACCESS_KEY"
-      ],
-      "net": ["garage:3903"]
     }
   }
 }

@@ -6,25 +6,50 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/home/deno/app
-    command: ["deno", "run", "test:with-init", "--watch"]
+    command: ["deno", "run", "test", "--watch"]
     env_file:
       - test.env
     depends_on:
-      garage:
+      minio:
         condition: service_healthy
       clamav:
         condition: service_healthy
 
-  # S3-compatible storage server
-  garage:
-    image: dxflrs/garage:v2.1.0
+  # MinIO S3-compatible storage service
+  minio:
+    image: minio/minio
+    ports:
+      - "9010:9010"
+      - "9011:9011"
     volumes:
-      - ./garage/garage.toml:/etc/garage.toml:ro
+      - minio_storage:/data
     env_file:
       - test.env
+    environment:
+      MINIO_ADDRESS: ':9010'
+      MINIO_CONSOLE_ADDRESS: ':9011'
+    command: server --console-address ":9011" /data
     healthcheck:
-      test: ["CMD", "/garage", "status"]
-      timeout: 10s
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9010' || exit 1
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 2
+
+  # MinIO client to initialize bucket
+  minio-init:
+    image: minio/mc
+    env_file:
+      - test.env
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: |
+      /bin/sh -c "
+        mc alias set dataset $${S3_ENDPOINT} $${S3_ACCESS_KEY_ID} $${S3_SECRET_ACCESS_KEY};
+        mc mb dataset/$${S3_BUCKET} --ignore-existing --region $${S3_REGION};
+        exit 0
+      "
 
   # ClamAV antivirus service
   clamav:
@@ -42,3 +67,4 @@ services:
 
 volumes:
   clam-db:
+  minio_storage:

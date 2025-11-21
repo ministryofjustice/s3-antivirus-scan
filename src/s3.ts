@@ -67,12 +67,30 @@ async function getS3Client(): Promise<S3Client> {
   return s3Client!;
 }
 
+interface GetObjectsForScanningOptions {
+  limit?: number;
+  maxFileSize?: number;
+}
+
+interface GetObjectsForScanningResult {
+  objectKeys: Set<string>;
+  aggregates: {
+    totalSizeBytes: number;
+    objectCount: number;
+  };
+}
+
 export const getObjectsForScanning = async ({
   limit,
   maxFileSize = 25 * 1024 * 1024, // 25MB default ClamAV INSTREAM limit
-}: { limit?: number; maxFileSize?: number } = {}): Promise<Set<string>> => {
+}: GetObjectsForScanningOptions = {}): Promise<GetObjectsForScanningResult> => {
   // Create an empty set to hold files needing scanning
-  const filesToScan = new Set<string>();
+  const objectKeys = new Set<string>();
+
+  const aggregates = {
+    totalSizeBytes: 0,
+    objectCount: 0,
+  };
 
   const client = await getS3Client();
   console.log(`Listing objects in bucket: ${Deno.env.get("S3_BUCKET")}`);
@@ -97,19 +115,19 @@ export const getObjectsForScanning = async ({
       continue;
     }
 
-    console.log(
-      `Found object for scanning: ${obj.key} (${obj.size || "unknown"} bytes)`,
-    );
-    filesToScan.add(obj.key);
+    aggregates.totalSizeBytes += obj.size || 0;
+    aggregates.objectCount += 1;
+
+    objectKeys.add(obj.key);
 
     // If a limit is set and we've reached it, break out of the loop
-    if (limit && filesToScan.size >= limit) {
+    if (limit && objectKeys.size >= limit) {
+      console.log(`Reached limit of ${limit} objects to scan`);
       break;
     }
   }
 
-  console.log(`Found ${filesToScan.size} objects to scan`);
-  return filesToScan;
+  return { objectKeys, aggregates };
 };
 
 export const getObjectStatus = async (
