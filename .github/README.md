@@ -104,7 +104,6 @@ The attached service account will populate the `AWS_ROLE_ARN` and `AWS_WEB_IDENT
 | S3_BUCKET                               | The AWS region where the S3 bucket is located.                         | Empty            | Yes         |
 | S3_ENDPOINT                             | The S3 endpoint URL.                                                   | Empty            | Yes         |
 | S3_REGION                               | The AWS region where the S3 bucket is located.                         | Empty            | Yes         |
-| S3_PREFIX                               | The prefix (folder path) within the S3 bucket to scan                  |
 | **S3 (local and testing only)**         |
 | AWS_ACCESS_KEY_ID                       | The AWS access key ID for accessing the S3 bucket.                     | Empty            | For testing |
 | AWS_SECRET_ACCESS_KEY                   | The AWS secret access key for accessing the S3 bucket.                 | Empty            | For testing |
