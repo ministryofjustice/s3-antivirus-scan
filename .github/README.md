@@ -42,6 +42,16 @@ flowchart LR
 - IAM role with access to the target bucket or testing credentials during local runs (see `examples/irsa-s3-av.tf`)
 - S3 bucket with objects sized within the configured `CLAMAV_MAX_FILE_SIZE`
 
+## Limitations
+
+This service is a simple scanner and does not provide:
+
+- Quarantine or deletion of infected files
+- Reporting beyond exit codes and console logs
+- Parallel scanning (files are scanned sequentially)
+- Deduplication, all files listed in S3 are scanned, even if they are identical
+- State, all files are scanned on each run
+
 ## Local development
 
 Requires
