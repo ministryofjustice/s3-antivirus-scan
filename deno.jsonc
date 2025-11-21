@@ -4,7 +4,6 @@
     "production": "deno run --permission-set=production --allow-net=\"clamav:3310,sts.amazonaws.com:443,$S3_HOSTNAME\" src/main.ts"
   },
   "imports": {
-    "@aws-sdk/client-s3": "npm:@aws-sdk/client-s3@^3.917.0",
     "@bradenmacdonald/s3-lite-client": "jsr:@bradenmacdonald/s3-lite-client@^0.9.4",
     "@std/assert": "jsr:@std/assert@^1.0.15"
   },

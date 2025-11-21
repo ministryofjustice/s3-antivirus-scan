@@ -30,13 +30,14 @@ if (Deno.env.get("NODE_ENV") === "test") {
 
 // Config, for how to handle scan results, should certain conditions trigger non-zero exit codes?
 const failConfig = {
-  failOnSkipped: ["1", "true", "yes", "on"].includes(
+  // Values default to true, unless explicitly set to "0", "false", "no", or "off"
+  failOnSkipped: !["0", "false", "no", "off"].includes(
     (Deno.env.get("FAIL_ON_SKIPPED") || "").toLowerCase(),
   ),
-  failOnError: ["1", "true", "yes", "on"].includes(
+  failOnError: !["0", "false", "no", "off"].includes(
     (Deno.env.get("FAIL_ON_SCAN_ERROR") || "").toLowerCase(),
   ),
-  failOnInfected: ["1", "true", "yes", "on"].includes(
+  failOnInfected: !["0", "false", "no", "off"].includes(
     (Deno.env.get("FAIL_ON_INFECTED") || "").toLowerCase(),
   ),
 };
