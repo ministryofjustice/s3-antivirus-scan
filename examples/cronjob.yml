@@ -44,6 +44,8 @@ spec:
                 memory: "512Mi"
                 cpu: "500m"
             env:
+              - name: CLAMAV_PORT
+                value: "3310"
               - name: CLAMAV_MAX_FILE_SIZE
                 value: "250000000"  # 250MB in bytes
               - name: S3_BUCKET
