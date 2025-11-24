@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: s3-antivirus-scan-weekly
-  namespace: justice-gov-uk-dev
+  namespace: your-namespace
 spec:
   schedule: "0 2 * * 1" # At 02:00 on Monday
   successfulJobsHistoryLimit: 3
