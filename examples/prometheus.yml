@@ -15,7 +15,7 @@ spec:
       annotations:
         description: An antivirus job in namespace {{ $labels.namespace }} has failed. Click the Dashboard link for to view the logs.
         # Add your runbook URL here
-        # runbook_url: https://your-runbook-url-here
+        runbook_url: https://example.com
         summary: S3 Antivirus Scan Job has failed.
         dashboard_url: https://app-logs.cloud-platform.service.justice.gov.uk/_dashboards/app/data-explorer/discover#?_a=(discover:(columns:!(kubernetes.container_name,log),isDirty:!f,sort:!()),metadata:(indexPattern:bb90f230-0d2e-11ef-bf63-53113938c53a,view:discover))&_g=(time:(from:now-7d,to:now))&_q=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:bb90f230-0d2e-11ef-bf63-53113938c53a,key:kubernetes.namespace_name,negate:!f,params:(query:your-namespace),type:phrase),query:(match_phrase:(kubernetes.namespace_name:your-namespace))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:bb90f230-0d2e-11ef-bf63-53113938c53a,key:kubernetes.container_name,negate:!f,params:(query:s3-antivirus-scan),type:phrase),query:(match_phrase:(kubernetes.container_name:s3-antivirus-scan)))))
       expr: |
@@ -27,7 +27,7 @@ spec:
       annotations:
         description: An scheduled antivirus job in namespace {{ $labels.namespace }} has failed. Click the Dashboard link for to view the logs.
         # Add your runbook URL here
-        # runbook_url: https://your-runbook-url-here
+        runbook_url: https://example.com
         summary: S3 Antivirus Scan CronJob has failed.
         dashboard_url: https://app-logs.cloud-platform.service.justice.gov.uk/_dashboards/app/data-explorer/discover#?_a=(discover:(columns:!(kubernetes.container_name,log),isDirty:!f,sort:!()),metadata:(indexPattern:bb90f230-0d2e-11ef-bf63-53113938c53a,view:discover))&_g=(time:(from:now-7d,to:now))&_q=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:bb90f230-0d2e-11ef-bf63-53113938c53a,key:kubernetes.namespace_name,negate:!f,params:(query:your-namespace),type:phrase),query:(match_phrase:(kubernetes.namespace_name:your-namespace))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:bb90f230-0d2e-11ef-bf63-53113938c53a,key:kubernetes.container_name,negate:!f,params:(query:s3-antivirus-scan),type:phrase),query:(match_phrase:(kubernetes.container_name:s3-antivirus-scan)))))
       expr: |
