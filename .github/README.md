@@ -2,7 +2,7 @@
  
 # <img alt="MoJ logo" src="https://moj-logos.s3.eu-west-2.amazonaws.com/moj-uk-logo.png" width="200"><br>S3 Antivirus Scan
 
-[![repo standards badge](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/repository-standards/api/s3-antivirus-scan/badge)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/repository-standards/s3-antivirus-scan)
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/s3-antivirus-scan/badge)](https://github-community.service.justice.gov.uk/repository-standards/s3-antivirus-scan)
 [![License](https://img.shields.io/github/license/ministryofjustice/s3-antivirus-scan?style=for-the-badge)](https://github.com/ministryofjustice/s3-antivirus-scan/blob/main/LICENSE)
 
 </div>
@@ -116,6 +116,66 @@ The attached service account will populate the `AWS_ROLE_ARN` and `AWS_WEB_IDENT
 | FAIL_ON_SCAN_ERROR                      | Exit with a non-zero code if there is a scan error.                    | true             | No          |
 | FAIL_ON_INFECTED                        | Exit with a non-zero code if a file is infected.                       | true             | No          |
 
+## Example deployment
+
+Example Kubernetes manifest are provided in the examples folder:
+
+- `examples/irsa-s3-av.tf` for an IAM role and service account binding using Terraform.
+- `examples/clamav.yml` for a ClamAV deployment using a PersistentVolumeClaim for virus database storage.
+- `examples/job.yml` for a one-off job.
+- `examples/cronjob.yml` for a scheduled job.
+- `examples/prometheus.yml` for Prometheus alerting on job failures.
+
+## Logging and scan results
+
+When the container runs, it will log progress to the console. Example logs are shown below.
+
+```
+Refreshing AWS credentials...
+{
+  s3Config: {
+    endPoint: "https://s3.eu-west-2.amazonaws.com",
+    region: "eu-west-2",
+    bucket: "your-bucket-name"
+  }
+}
+Listing objects in bucket: your-bucket-name
+Skipping folder-like object: /
+Scanning starting: { totalSizeBytes: 4000000, objectCount: 123, skippedCount: 0 }
+Starting scan of 123 objects
+Scanned object: file-1.jpg, Result: Clean
+Scanned object: file-2.jpg, Result: Clean
+```
+
+Upon scan completion, a summary is logged:
+
+```
+Scanning complete: {
+  counts: { success: 123, clean: 119, infected: 4, skipped: 0, errors: 0 },
+  results: [
+    {
+      objectKey: "eicar.com",
+      clamAVResponse: { isInfected: true, virusName: "Win.Test.EICAR_HDB-1" }
+    },
+    {
+      objectKey: "eicar.com.txt",
+      clamAVResponse: { isInfected: true, virusName: "Win.Test.EICAR_HDB-1" }
+    },
+    {
+      objectKey: "eicar_com.zip",
+      clamAVResponse: { isInfected: true, virusName: "Win.Test.EICAR_HDB-1" }
+    },
+    {
+      objectKey: "eicar_com2.zip",
+      clamAVResponse: { isInfected: true, virusName: "Win.Test.EICAR_HDB-1" }
+    }
+  ],
+  durationSeconds: 54.321
+}
+
+Detected 4 infected object(s); exiting with code 1 due to CLAMAV_FAIL_ON_INFECTED.
+```
+
 ## Contributing
 
 To build and publish a new version of the Docker image to GitHub Container Registry:
@@ -128,10 +188,3 @@ The GitHub Actions workflow will build and push the image tagged with `latest` a
 SHA.
 
 The release can then be tagged in GitHub to create a versioned release of the image.
-
-## Example deployment
-
-Example Kubernetes manifest are provided in the examples folder:
-
-- `examples/job.yml` for a one-off job.
-- `examples/cronjob.yml` for a scheduled job.
