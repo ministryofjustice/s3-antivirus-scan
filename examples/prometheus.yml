@@ -6,7 +6,7 @@ metadata:
     prometheus: prometheus-operator
     role: alert-rules
     release: prometheus-operator
-  name: monitoring-rules-justice-gov-uk
+  name: monitoring-rules
 spec:
   groups:
   - name: s3-antivirus-scan
@@ -21,4 +21,4 @@ spec:
         kube_job_failed{namespace="your-namespace",job_name="s3-antivirus-scan-job"} > 0
       for: 0m
       labels:
-        severity: justice-gov-uk-alerts
+        severity: your-severity-level
