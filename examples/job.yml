@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: s3-antivirus-scan-job
-  namespace: justice-gov-uk-dev
+  namespace: your-namespace
 spec:
   backoffLimit: 0
   template:
