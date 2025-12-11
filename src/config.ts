@@ -28,8 +28,8 @@ if (Deno.env.get("NODE_ENV") === "test") {
   s3Config.sessionToken = credentials.sessionToken;
 }
 
-// Config, for how to handle scan results, should certain conditions trigger non-zero exit codes?
 const failConfig = {
+  // Config, for how to handle scan results, should certain conditions trigger non-zero exit codes?
   // Values default to true, unless explicitly set to "0", "false", "no", or "off"
   failOnSkipped: !["0", "false", "no", "off"].includes(
     (Deno.env.get("FAIL_ON_SKIPPED") || "").toLowerCase(),
@@ -40,6 +40,9 @@ const failConfig = {
   failOnInfected: !["0", "false", "no", "off"].includes(
     (Deno.env.get("FAIL_ON_INFECTED") || "").toLowerCase(),
   ),
+  // Config the retry behavior
+  retryBackoffSeconds: parseInt(Deno.env.get("RETRY_BACKOFF_SECONDS") || "2"),
+  retryMaxAttempts: parseInt(Deno.env.get("RETRY_MAX_ATTEMPTS") || "3"),
 };
 
 export { failConfig, s3Config };
