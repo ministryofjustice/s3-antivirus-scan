@@ -1,6 +1,5 @@
 import { type S3ClientOptions } from "@bradenmacdonald/s3-lite-client";
 import { webIdentityTokenProvider } from "./aws.ts";
-import { parse } from "node:path";
 
 // If we dont have the environment variables, we should throw an error
 if (
