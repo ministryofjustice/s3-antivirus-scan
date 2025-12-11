@@ -56,22 +56,50 @@ export const main = async () => {
   for (const objectKey of objectKeys) {
     objectStartTime = Date.now();
 
-    const stream = await getReadableStreamForObject(objectKey);
+    let attempt = 0;
+    let clamAVResponse: {
+      isInfected: boolean;
+      virusName?: string;
+    } | null = null;
 
-    if (!stream) {
-      console.log(`Could not get stream for object: ${objectKey}`);
-      continue;
+    while (attempt < failConfig.retryMaxAttempts) {
+      attempt++;
+      try {
+        const stream = await getReadableStreamForObject(objectKey);
+
+        if (!stream) {
+          throw new Error(`Could not get stream for object: ${objectKey}`);
+        }
+
+        clamAVResponse = await streamToClamAv(stream);
+        break; // Exit the retry loop on success
+      } catch (error) {
+        if (attempt >= failConfig.retryMaxAttempts) {
+          console.error(`Scanned object: ${objectKey}, Result: Error`, error);
+          summary.counts.errors++;
+          summary.results.push({
+            objectKey,
+            error,
+            objectStatus: await getObjectStatus(objectKey),
+            durationSeconds: (Date.now() - objectStartTime) / 1000,
+          });
+        } else {
+          await new Promise((resolve) =>
+            setTimeout(
+              resolve,
+              failConfig.retryBackoffSeconds ** attempt * 1000,
+            )
+          );
+        }
+      }
     }
 
-    // Send the stream to ClamAV for scanning
-
-    try {
-      const clamAVResponse = await streamToClamAv(stream);
-
+    if (clamAVResponse) {
       summary.counts.success++;
 
       if (!clamAVResponse.isInfected) {
         summary.counts.clean++;
+        console.log(`Scanned object: ${objectKey}, Result: Clean`);
       }
 
       if (clamAVResponse.isInfected) {
@@ -80,24 +108,10 @@ export const main = async () => {
           objectKey,
           clamAVResponse,
         });
+        console.log(
+          `Scanned object: ${objectKey}, Result: Infected (${clamAVResponse.virusName})`,
+        );
       }
-
-      console.log(
-        `Scanned object: ${objectKey}, Result: ${
-          clamAVResponse.isInfected
-            ? `Infected (${clamAVResponse.virusName})`
-            : "Clean"
-        }`,
-      );
-    } catch (error) {
-      console.error(`Error scanning object ${objectKey}:`, error);
-      summary.counts.errors++;
-      summary.results.push({
-        objectKey,
-        error,
-        objectStatus: await getObjectStatus(objectKey),
-        durationSeconds: (Date.now() - objectStartTime) / 1000,
-      });
     }
   }
 

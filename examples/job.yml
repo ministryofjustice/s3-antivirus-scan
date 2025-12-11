@@ -1,26 +1,13 @@
-# PVC for scan data
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: s3-antivirus-scan-pvc
-  namespace: justice-gov-uk-dev
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: s3-antivirus-scan-job
-  namespace: justice-gov-uk-dev
+  namespace: your-namespace
 spec:
-  backoffLimit: 3
+  backoffLimit: 0
   template:
     spec:
-      serviceAccountName: justice-gov-uk-dev-av
+      serviceAccountName: s3-av-serviceaccount
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
@@ -57,16 +44,8 @@ spec:
             value: https://s3.eu-west-2.amazonaws.com
           - name: S3_REGION
             value: eu-west-2
-        volumeMounts:
-          - name: scan-data
-            mountPath: /data
         securityContext:
           allowPrivilegeEscalation: false
           capabilities: 
             drop: ["ALL"]
-      volumes:
-        - name: scan-data
-          persistentVolumeClaim:
-            claimName: s3-antivirus-scan-pvc
       restartPolicy: Never
----
