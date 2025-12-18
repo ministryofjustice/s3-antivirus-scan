@@ -95,26 +95,28 @@ On Cloud Platform, a Kubernetes secret should be unnecessary, since `AWS_ACCESS_
 should not be set. Instead, create a service account with read only access to the S3 bucket and attach it to the deployment.
 The attached service account will populate the `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` environment variables.
 
-| Variable                                | Description                                                            | Default          | Required    |
-| --------------------------------------- | ---------------------------------------------------------------------- | ---------------- | ----------- |
+| Variable                                | Description                                                                                   | Default          | Required    |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------- | ----------- |
 | **AWS EKS - service account variables** |
-| AWS_ROLE_ARN                            | The ARN of the AWS role to assume for accessing the S3 bucket.         |                  | For testing |
-| AWS_WEB_IDENTITY_TOKEN_FILE             | The file path to the web identity token for the service account.       |                  | For testing |
+| AWS_ROLE_ARN                            | The ARN of the AWS role to assume for accessing the S3 bucket.                                |                  | For testing |
+| AWS_WEB_IDENTITY_TOKEN_FILE             | The file path to the web identity token for the service account.                              |                  | For testing |
 | **S3**                                  |
-| S3_BUCKET                               | The AWS region where the S3 bucket is located.                         | Empty            | Yes         |
-| S3_ENDPOINT                             | The S3 endpoint URL.                                                   | Empty            | Yes         |
-| S3_REGION                               | The AWS region where the S3 bucket is located.                         | Empty            | Yes         |
+| S3_BUCKET                               | The AWS region where the S3 bucket is located.                                                | Empty            | Yes         |
+| S3_ENDPOINT                             | The S3 endpoint URL.                                                                          | Empty            | Yes         |
+| S3_REGION                               | The AWS region where the S3 bucket is located.                                                | Empty            | Yes         |
 | **S3 (local and testing only)**         |
-| AWS_ACCESS_KEY_ID                       | The AWS access key ID for accessing the S3 bucket.                     | Empty            | For testing |
-| AWS_SECRET_ACCESS_KEY                   | The AWS secret access key for accessing the S3 bucket.                 | Empty            | For testing |
+| AWS_ACCESS_KEY_ID                       | The AWS access key ID for accessing the S3 bucket.                                            | Empty            | For testing |
+| AWS_SECRET_ACCESS_KEY                   | The AWS secret access key for accessing the S3 bucket.                                        | Empty            | For testing |
 | **ClamAV**                              |
-| CLAMAV_HOST                             | The hostname or IP address of the ClamAV server.                       | clamav           | No          |
-| CLAMAV_MAX_FILE_SIZE                    | The maximum file size that ClamAV will scan (in bytes).                | 26214400 (25 MB) | No          |
-| CLAMAV_PORT                             | The port number on which the ClamAV server is listening.               | 3310             | No          |
+| CLAMAV_HOST                             | The hostname or IP address of the ClamAV server.                                              | clamav           | No          |
+| CLAMAV_MAX_FILE_SIZE                    | The maximum file size that ClamAV will scan (in bytes).                                       | 26214400 (25 MB) | No          |
+| CLAMAV_PORT                             | The port number on which the ClamAV server is listening.                                      | 3310             | No          |
 | **Application**                         |
-| FAIL_ON_SKIPPED                         | Exit with a non-zero code if a file is skipped (i.e. large file size). | true             | No          |
-| FAIL_ON_SCAN_ERROR                      | Exit with a non-zero code if there is a scan error.                    | true             | No          |
-| FAIL_ON_INFECTED                        | Exit with a non-zero code if a file is infected.                       | true             | No          |
+| RETRY_MAX_ATTEMPTS                      | The maximum number of retry attempts for processing a single file.                            | 3                | No          |
+| RETRY_BACKOFF_SECONDS                   | Duration in seconds between retries - increases exponentially with each retry e.g. 2, 4, 8... | 2                | No          |
+| FAIL_ON_SKIPPED                         | Exit with a non-zero code if a file is skipped (i.e. large file size).                        | true             | No          |
+| FAIL_ON_SCAN_ERROR                      | Exit with a non-zero code if there is a scan error.                                           | true             | No          |
+| FAIL_ON_INFECTED                        | Exit with a non-zero code if a file is infected.                                              | true             | No          |
 
 ## Example deployment
 
