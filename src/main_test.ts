@@ -103,7 +103,7 @@ Deno.test("main function runs without errors", async () => {
       objectKey: "infected-file.txt",
       clamAVResponse: {
         isInfected: true,
-        virusName: "Win.Test.EICAR_HDB-1",
+        virusName: "Eicar-Test-Signature",
       },
     },
   ]);
